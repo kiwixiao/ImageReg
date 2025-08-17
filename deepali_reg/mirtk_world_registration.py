@@ -235,7 +235,7 @@ class CleanMIRTKRegistration:
                     # Apply the SAME inverse transformation used for static image
                     # Use NEAREST NEIGHBOR interpolation for segmentation to preserve discrete labels
                     # Create transformer with nearest neighbor interpolation
-                    seg_transformer = spatial.ImageTransformer(inverse_transform, padding='border')
+                    seg_transformer = spatial.ImageTransformer(inverse_transform, sampling='nearest', padding='border')
                     warped_seg_tensor = seg_transformer(static_seg_deepali.tensor())
                     
                     # Convert back to SimpleITK with nearest neighbor interpolation for labels

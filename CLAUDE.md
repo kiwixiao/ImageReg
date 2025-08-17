@@ -1,0 +1,4 @@
+- regTemplate_mirtk, this is the mirtk registartion pipeline. which is proven working perfectly.
+- @MIRTK is the source code of mirtk binary, use this as reference
+- @MIRTK_Analysis_Reference.md @MIRTK_Research_Findings.md remember those 2 for some mirkt background.
+- @MIRTK/ this is the source code of mirtk

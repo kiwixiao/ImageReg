@@ -1,0 +1,39 @@
+# MIRTK Dynamic Registration Configuration
+# Configuration for frame extraction and temporal information
+
+# Frame extraction settings
+frames:
+  start_frame: 11          # First frame to extract (0-based indexing)
+  end_frame: 21            # Last frame to extract (inclusive)
+  
+# Temporal information for motion table interpolation
+temporal:
+  duration_ms: 3451       # Total time duration for extracted frames (milliseconds)
+  frame_rate_fps: null    # Frame rate if known (frames per second) - optional
+  
+# Folder configuration
+folders:
+  input_folder: "inputs_OSAMRI016"          # Input folder name
+  output_folder: "outputs_OSAMRI016"        # Output folder name
+
+# Input paths (relative to ImageReg working directory)
+input_paths:
+  static_image: "inputs_OSAMRI016/OSAMRI016_2501_static.nii"
+  dynamic_image: "inputs_OSAMRI016/OSAMRI016_2601_Dynamic.nii"
+  segmentation: "inputs_OSAMRI016/OSAMRI016_2501_airway_seg.nii.gz"
+
+# Output settings (relative to ImageReg working directory)
+output:
+  base_directory: "outputs_OSAMRI016"
+  frames_directory: "extracted_frames"
+  
+# Registration parameters
+registration:
+  device: "cpu"               # Device for computation: "cpu" or "cuda"
+  pyramid_levels: [4, 3, 2]   # Multi-resolution levels
+  nmi_bins: 64                # NMI histogram bins
+
+# Development/Debug settings
+debug:
+  save_intermediate_files: true
+  verbose_output: true

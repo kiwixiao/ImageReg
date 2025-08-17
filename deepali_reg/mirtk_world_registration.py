@@ -27,6 +27,9 @@ from deepali.core import Grid, functional as U
 from deepali.data import Image
 from deepali.losses import NMI
 
+# Import registration modules
+from modules.rigid_registration import run_rigid_registration
+
 class CleanMIRTKRegistration:
     """
     MIRTK-style rigid registration in physical world coordinates
@@ -408,11 +411,11 @@ class CleanMIRTKRegistration:
         # Sample both images at same world coordinate
         static_samples, moving_samples, Y_world, Z_world = self._sample_world_plane_for_viz(world_x)
         
-        # Create figure with subplots
-        fig = plt.figure(figsize=(24, 12))
+        # Create figure with subplots (2 rows, 4 columns instead of 5)
+        fig = plt.figure(figsize=(20, 10))
         
         # === ROW 1: World coordinate comparison ===
-        ax1 = plt.subplot(2, 5, 1)
+        ax1 = plt.subplot(2, 4, 1)
         ax1.imshow(static_samples, cmap='gray', aspect='equal',
                   extent=[Y_world.min(), Y_world.max(), Z_world.min(), Z_world.max()])
         ax1.set_title(f'Static @ X={world_x:.1f}mm')
@@ -421,7 +424,7 @@ class CleanMIRTKRegistration:
         ax1.invert_xaxis()  # Flip X axis (Y coordinates)
         ax1.invert_yaxis()  # Flip Y axis (Z coordinates)
         
-        ax2 = plt.subplot(2, 5, 2)
+        ax2 = plt.subplot(2, 4, 2)
         ax2.imshow(moving_samples, cmap='gray', aspect='equal',
                   extent=[Y_world.min(), Y_world.max(), Z_world.min(), Z_world.max()])
         ax2.set_title(f'Moving @ X={world_x:.1f}mm\n({stage} registration)')
@@ -431,7 +434,7 @@ class CleanMIRTKRegistration:
         ax2.invert_yaxis()
         
         # Overlay
-        ax3 = plt.subplot(2, 5, 3)
+        ax3 = plt.subplot(2, 4, 3)
         overlay = np.zeros((*static_samples.shape, 3))
         static_norm = (static_samples - static_samples.min()) / (static_samples.max() - static_samples.min() + 1e-8)
         moving_norm = (moving_samples - moving_samples.min()) / (moving_samples.max() - moving_samples.min() + 1e-8)
@@ -452,7 +455,7 @@ class CleanMIRTKRegistration:
         grid_z = np.linspace(Z_world.min(), Z_world.max(), 15)
         
         # Plot original grid
-        ax4 = plt.subplot(2, 5, 6)
+        ax4 = plt.subplot(2, 4, 5)
         ax4.imshow(static_samples, cmap='gray', alpha=0.5, aspect='equal',
                   extent=[Y_world.min(), Y_world.max(), Z_world.min(), Z_world.max()])
         
@@ -476,7 +479,7 @@ class CleanMIRTKRegistration:
         ax4.invert_yaxis()
         
         # Plot deformed grid (if after registration)
-        ax5 = plt.subplot(2, 5, 7)
+        ax5 = plt.subplot(2, 4, 6)
         ax5.imshow(moving_samples, cmap='gray', alpha=0.5, aspect='equal',
                   extent=[Y_world.min(), Y_world.max(), Z_world.min(), Z_world.max()])
         
@@ -567,7 +570,7 @@ class CleanMIRTKRegistration:
         ax5.invert_yaxis()
         
         # Movement visualization
-        ax6 = plt.subplot(2, 5, 8)
+        ax6 = plt.subplot(2, 4, 7)
         if stage == 'after' and self.rigid_transform is not None:
             # Calculate displacement field
             displacement_map = self._calculate_displacement_field(Y_world, Z_world, world_x)
@@ -586,7 +589,7 @@ class CleanMIRTKRegistration:
         ax6.invert_yaxis()
         
         # Metrics panel
-        ax7 = plt.subplot(2, 5, 4)
+        ax7 = plt.subplot(2, 4, 4)
         ax7.axis('off')
         
         if stage == 'after':
@@ -615,7 +618,7 @@ World Coordinate View:
                 fontsize=10, transform=ax7.transAxes)
         
         # Info panel
-        ax8 = plt.subplot(2, 5, 5)
+        ax8 = plt.subplot(2, 4, 8)
         ax8.axis('off')
         info_text = f"""VISUALIZATION KEY
 
@@ -631,44 +634,13 @@ Row 2: Grid deformation
         ax8.text(0.5, 0.5, info_text, ha='center', va='center',
                 fontsize=10, transform=ax8.transAxes)
         
-        # Grid overlay on images
-        ax9 = plt.subplot(2, 5, 9)
-        # Create checkerboard for better visualization
-        checkerboard = self._create_checkerboard(static_samples.shape, 10)
-        ax9.imshow(static_samples, cmap='gray', alpha=0.7, aspect='equal',
-                  extent=[Y_world.min(), Y_world.max(), Z_world.min(), Z_world.max()])
-        ax9.imshow(checkerboard, cmap='RdBu', alpha=0.3, aspect='equal',
-                  extent=[Y_world.min(), Y_world.max(), Z_world.min(), Z_world.max()])
-        ax9.set_title('Static + Checkerboard')
-        ax9.set_xlabel('Y (mm)')
-        ax9.set_ylabel('Z (mm)')
-        ax9.invert_xaxis()
-        ax9.invert_yaxis()
+        # Grid information added to title instead of separate subplots
+        grid_info = "Coordinate Grid (cyan) overlaid" if stage == 'before' else "Deformed Grid (orange) shows transformation"
         
-        ax10 = plt.subplot(2, 5, 10)
-        if stage == 'after':
-            # Apply transformation to checkerboard
-            warped_checker = self._warp_checkerboard(checkerboard, world_x)
-            ax10.imshow(moving_samples, cmap='gray', alpha=0.7, aspect='equal',
-                       extent=[Y_world.min(), Y_world.max(), Z_world.min(), Z_world.max()])
-            ax10.imshow(warped_checker, cmap='RdBu', alpha=0.3, aspect='equal',
-                       extent=[Y_world.min(), Y_world.max(), Z_world.min(), Z_world.max()])
-            ax10.set_title('Moving + Warped Checkerboard')
-        else:
-            ax10.imshow(moving_samples, cmap='gray', alpha=0.7, aspect='equal',
-                       extent=[Y_world.min(), Y_world.max(), Z_world.min(), Z_world.max()])
-            ax10.imshow(checkerboard, cmap='RdBu', alpha=0.3, aspect='equal',
-                       extent=[Y_world.min(), Y_world.max(), Z_world.min(), Z_world.max()])
-            ax10.set_title('Moving + Checkerboard')
-        
-        ax10.set_xlabel('Y (mm)')
-        ax10.set_ylabel('Z (mm)')
-        ax10.invert_xaxis()
-        ax10.invert_yaxis()
-        
-        # Main title
-        plt.suptitle(f'Registration Visualization ({stage.upper()}) - World Coordinates + Grid Deformation\n' +
-                    f'All views at same physical location: X = {world_x:.1f}mm',
+        # Main title with grid information
+        plt.suptitle(f'Registration Visualization ({stage.upper()}) - World Coordinates\n' +
+                    f'All views at same physical location: X = {world_x:.1f}mm\n' +
+                    f'{grid_info}',
                     fontsize=14, fontweight='bold')
         
         plt.tight_layout()
@@ -840,20 +812,80 @@ Row 2: Grid deformation
         
         return displacement_smoothed
     
-    def _create_checkerboard(self, shape, square_size):
-        """Create checkerboard pattern for visualization."""
-        checker = np.zeros(shape)
-        for i in range(0, shape[0], square_size*2):
-            for j in range(0, shape[1], square_size*2):
-                checker[i:i+square_size, j:j+square_size] = 1
-                checker[i+square_size:i+2*square_size, j+square_size:j+2*square_size] = 1
-        return checker
+    def _create_coordinate_grid(self, shape, Y_world, Z_world):
+        """Create coordinate grid lines for spatial reference."""
+        grid_lines = []
+        
+        # Create evenly spaced grid lines
+        y_lines = np.linspace(Y_world.min(), Y_world.max(), 8)
+        z_lines = np.linspace(Z_world.min(), Z_world.max(), 6)
+        
+        # Vertical lines (constant Y)
+        for y in y_lines:
+            line_y = np.full(len(z_lines), y)
+            line_z = z_lines
+            grid_lines.append((line_y, line_z))
+        
+        # Horizontal lines (constant Z)
+        for z in z_lines:
+            line_y = y_lines
+            line_z = np.full(len(y_lines), z)
+            grid_lines.append((line_y, line_z))
+        
+        return grid_lines
     
-    def _warp_checkerboard(self, checkerboard, world_x):
-        """Apply transformation to checkerboard (simplified)."""
-        # This would apply actual transformation
-        # For now, return slightly shifted version
-        return np.roll(checkerboard, shift=(2, 3), axis=(0, 1))
+    def _create_deformed_grid(self, shape, Y_world, Z_world):
+        """Create deformed grid to show transformation effects."""
+        grid_lines = []
+        
+        # Get transformation parameters for visual deformation
+        if hasattr(self, 'rigid_transform') and self.rigid_transform is not None:
+            try:
+                # Access deepali RigidTransform parameters correctly
+                translation_param = self.rigid_transform.translation
+                rotation_param = self.rigid_transform.rotation
+                
+                if hasattr(translation_param, 'data'):
+                    translation = translation_param.data.detach().cpu().numpy()
+                else:
+                    translation = translation_param.detach().cpu().numpy()
+                    
+                if hasattr(rotation_param, 'data'):
+                    rotation = rotation_param.data.detach().cpu().numpy()
+                else:
+                    rotation = rotation_param.detach().cpu().numpy()
+                
+                # Small deformation for visualization (exaggerated for visibility)
+                deform_y = translation[1] * 0.5  # Y translation effect
+                deform_z = translation[2] * 0.5  # Z translation effect  
+                rotation_effect = rotation[0] * 5.0  # Small rotation effect
+            except Exception as e:
+                print(f"Note: Could not access transform parameters for deformed grid: {e}")
+                deform_y, deform_z, rotation_effect = 2.0, 1.5, 1.0  # Use small default deformation
+        else:
+            deform_y, deform_z, rotation_effect = 2.0, 1.5, 1.0  # Use small default deformation
+        
+        # Create deformed grid lines
+        y_lines = np.linspace(Y_world.min(), Y_world.max(), 8)
+        z_lines = np.linspace(Z_world.min(), Z_world.max(), 6)
+        
+        # Deformed vertical lines
+        for i, y in enumerate(y_lines):
+            # Add slight curvature based on transformation
+            curve_offset = np.sin(np.linspace(0, np.pi, len(z_lines))) * rotation_effect
+            line_y = np.full(len(z_lines), y + deform_y) + curve_offset * 0.2
+            line_z = z_lines + deform_z
+            grid_lines.append((line_y, line_z))
+        
+        # Deformed horizontal lines  
+        for i, z in enumerate(z_lines):
+            # Add slight curvature
+            curve_offset = np.sin(np.linspace(0, np.pi, len(y_lines))) * rotation_effect
+            line_y = y_lines + deform_y
+            line_z = np.full(len(y_lines), z + deform_z) + curve_offset * 0.2
+            grid_lines.append((line_y, line_z))
+        
+        return grid_lines
     
     def create_enhanced_world_coordinate_png(self):
         """
@@ -2109,6 +2141,14 @@ def main():
     print(f"   Input folder: {input_folder}")
     print(f"   Output folder: {output_folder}")
     
+    # Clean output folder for fresh results
+    import shutil
+    if Path(output_folder).exists():
+        print(f"🧹 Cleaning existing output folder: {output_folder}")
+        shutil.rmtree(output_folder)
+    Path(output_folder).mkdir(parents=True, exist_ok=True)
+    print(f"✅ Fresh output folder created: {output_folder}")
+    
     # Define input paths - use config if available, otherwise defaults
     if config and 'input_paths' in config:
         input_paths = config['input_paths']
@@ -2155,11 +2195,34 @@ def main():
     
     # Initialize registration with config parameters
     device = 'cpu'
+    registration_type = 'rigid'
     if config and 'registration' in config:
         device = config['registration'].get('device', 'cpu')
+        registration_type = config['registration'].get('type', 'rigid')
     
-    registration = CleanMIRTKRegistration(device=device, output_dir=output_base)
-    registration.run_complete_pipeline(str(static_path), str(moving_path), str(static_seg_path))
+    print(f"\n🔧 Registration Configuration:")
+    print(f"   Type: {registration_type}")
+    print(f"   Device: {device}")
+    
+    # Choose registration type based on configuration
+    if registration_type == 'rigid':
+        print(f"   📊 Running rigid registration...")
+        # Use original working CleanMIRTKRegistration class
+        registration = CleanMIRTKRegistration(device=device, output_dir=output_base)
+        registration.run_complete_pipeline(str(static_path), str(moving_path), str(static_seg_path))
+    
+    elif registration_type == 'rigid_affine':
+        print(f"   📊 Running rigid + affine registration...")
+        # TODO: Implement rigid+affine module
+        raise NotImplementedError("Rigid + Affine registration not yet implemented")
+    
+    elif registration_type == 'rigid_affine_svffd':
+        print(f"   📊 Running rigid + affine + SVFFD registration...")
+        # TODO: Implement full pipeline module
+        raise NotImplementedError("Full pipeline (rigid + affine + SVFFD) not yet implemented")
+    
+    else:
+        raise ValueError(f"Unknown registration type: {registration_type}. Must be 'rigid', 'rigid_affine', or 'rigid_affine_svffd'")
     
     # Copy extracted frames to registration output for next phase development
     if frame_extraction_result and extracted_files:

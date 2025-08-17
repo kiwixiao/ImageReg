@@ -29,6 +29,7 @@ output:
   
 # Registration parameters
 registration:
+  type: "rigid"               # Registration type: "rigid", "rigid_affine", "rigid_affine_svffd"
   device: "cpu"               # Device for computation: "cpu" or "cuda"
   pyramid_levels: [4, 3, 2]   # Multi-resolution levels
   nmi_bins: 64                # NMI histogram bins

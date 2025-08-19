@@ -18,6 +18,8 @@ from .io_utils import (
 
 # Import new registration modules
 from .rigid_registration import run_rigid_registration
+from .rigid_affine_registration import run_rigid_affine_registration
+from .rigid_affine_svffd_registration import run_rigid_affine_svffd_registration
 
 __all__ = [
     # I/O
@@ -29,4 +31,6 @@ __all__ = [
     "write_stl_mesh",
     # Registration modules
     "run_rigid_registration",
+    "run_rigid_affine_registration",
+    "run_rigid_affine_svffd_registration",
 ]

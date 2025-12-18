@@ -1,0 +1,28 @@
+# DAREG - Deepali Registration Pipeline
+# Requirements for medical image registration using deepali
+
+# Core dependencies
+torch>=2.0.0
+numpy>=1.21.0
+
+# Medical image I/O
+SimpleITK>=2.2.0
+
+# Visualization
+matplotlib>=3.5.0
+
+# Configuration
+PyYAML>=6.0
+
+# PDF report generation (optional, for pdf_report.py)
+# matplotlib.backends.backend_pdf is included with matplotlib
+
+# Progress bars (optional)
+tqdm>=4.64.0
+
+# Deepali library (local installation)
+# Install from local deepali/src directory:
+# pip install -e ./deepali/src
+
+# Note: deepali requires specific versions, install it separately:
+# cd deepali/src && pip install -e .

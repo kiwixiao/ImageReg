@@ -5,14 +5,23 @@ Medical image registration system replicating [MIRTK](https://mirtk.github.io/) 
 ## Installation
 
 ```bash
-# From local checkout
+git clone https://github.com/kiwixiao/ImageReg.git
+cd ImageReg
 pip install .
+```
 
-# Editable mode (for development)
-pip install -e .
+This installs DAREG and all dependencies (including `hf-deepali`, PyTorch, nibabel, etc.).
 
-# With optional STL/video support
-pip install -e ".[all]"
+**For developers** who want to edit the source code and have changes take effect immediately:
+
+```bash
+pip install -e .        # editable install - changes apply without reinstalling
+```
+
+**With optional extras** (STL mesh generation, video export):
+
+```bash
+pip install ".[all]"    # includes scikit-image, trimesh, imageio
 ```
 
 ## Quick Start

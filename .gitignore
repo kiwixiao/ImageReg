@@ -18,6 +18,18 @@ __pycache__/
 # Planning docs (private)
 planning/
 
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
 # Test outputs
 test_output_*/
+test_pip_output/
 motion_output/
+
+# AI tooling
+.autonomous/
+
+# Lock files
+uv.lock

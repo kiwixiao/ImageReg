@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dareg"
+version = "1.0.0"
+description = "Medical image registration replicating MIRTK using deepali"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.9"
+
+dependencies = [
+    "hf-deepali[utils]",
+    "torch>=2.0",
+    "numpy>=1.21",
+    "nibabel>=3.0",
+    "SimpleITK>=2.2",
+    "scipy>=1.7",
+    "matplotlib>=3.5",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+stl = ["scikit-image>=0.19", "trimesh>=3.9"]
+video = ["imageio>=2.9", "imageio-ffmpeg>=0.4"]
+all = ["dareg[stl,video]"]
+
+[project.scripts]
+dareg = "dareg.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["dareg*"]
+
+[tool.setuptools.package-data]
+dareg = ["configs/*.yaml", "configs/README.md", "docs/*.md"]

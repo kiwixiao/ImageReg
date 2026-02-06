@@ -1,5 +1,5 @@
 # Testing Project Configuration
-# Can run standalone: python -m DAREG.main_motion --config inputs_testing/registration_config.yaml
+# Can run standalone: dareg motion --config inputs_testing/registration_config.yaml
 # Or auto-loaded when --image4d is from this folder
 
 # Input/Output Paths

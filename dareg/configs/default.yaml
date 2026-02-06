@@ -1,0 +1,89 @@
+# DAREG Default Configuration
+# Complete configuration with ALL fields explicitly defined
+# MIRTK-equivalent FFD + Standard SVFFD settings
+
+# Frame Selection (for 4D images)
+frame_selection:
+  start_frame: 0       # Beginning frame (0-indexed)
+  num_frames: null     # Number of frames (null = all)
+
+# Pipeline Settings
+pipeline:
+  stages: [rigid, affine, ffd]  # Registration stages to run
+  device: auto                   # auto, cpu, cuda, mps
+
+# Similarity Metric Settings
+similarity:
+  metric: nmi                    # nmi, ncc, or ssd
+  num_bins: 64                   # Histogram bins for NMI
+  foreground_threshold: 0.01    # Threshold for foreground masking
+  roi_mask: null                 # Optional ROI mask path
+
+# Rigid Registration
+rigid:
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.01, 0.01, 0.01, 0.01]
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+# Affine Registration
+affine:
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.01, 0.01, 0.01, 0.01]
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+# FFD Configuration (MIRTK-equivalent)
+ffd:
+  control_point_spacing: 4
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.01, 0.01, 0.01, 0.01]
+  regularization:
+    bending_weight: 0.001
+    diffusion_weight: 0.0005
+  optimizer:
+    max_rejected_streak: 1
+    step_rise: 1.1
+    step_drop: 0.5
+    epsilon: 1e-4
+    delta: 1e-12
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+# SVFFD Configuration (Diffeomorphic)
+svffd:
+  control_point_spacing: 4
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.005, 0.005, 0.005, 0.005]
+  integration_steps: 5
+  regularization:
+    bending_weight: 0.0005
+    diffusion_weight: 0.00025
+    velocity_smoothing_sigma: 0.0
+    laplacian_weight: 0.0
+    jacobian_penalty: 0.0
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+# Output Settings
+output:
+  auto_name: true
+  name_template: "{model}_cp{spacing}_bend{bending}"
+  save_intermediate: true
+  save_transforms: true
+  create_visualizations: true
+  create_pdf_report: true
+
+# Visualization Settings
+visualization:
+  dpi: 150
+  figsize: [18, 12]
+  colormap: gray

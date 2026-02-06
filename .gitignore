@@ -15,6 +15,9 @@ __pycache__/
 *.nii
 *.nii.gz
 
+# Planning docs (private)
+planning/
+
 # Test outputs
 test_output_*/
 motion_output/

@@ -18,6 +18,9 @@ __pycache__/
 # Planning docs (private)
 planning/
 
+# Virtual environments
+.venv/
+
 # Build artifacts
 build/
 dist/

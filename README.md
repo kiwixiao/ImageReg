@@ -4,24 +4,45 @@ Medical image registration system replicating [MIRTK](https://mirtk.github.io/) 
 
 ## Installation
 
+### Quick Setup (Recommended)
+
+Clone and run the setup script — it automatically creates an isolated environment and installs everything:
+
 ```bash
 git clone https://github.com/kiwixiao/ImageReg.git
 cd ImageReg
-pip install .
+bash setup.sh
 ```
 
-This installs DAREG and all dependencies (including `hf-deepali`, PyTorch, nibabel, etc.).
+The script detects your system and does the right thing:
+- **Has conda?** Creates a conda env named `image-reg`, installs dareg into it
+- **No conda?** Creates a Python venv (`.venv/`), installs dareg into it
 
-**For developers** who want to edit the source code and have changes take effect immediately:
-
+Options:
 ```bash
-pip install -e .        # editable install - changes apply without reinstalling
+bash setup.sh --all     # include optional extras (STL mesh, video export)
+bash setup.sh --dev     # editable install for development
 ```
 
-**With optional extras** (STL mesh generation, video export):
+After setup, activate and use:
+```bash
+# If conda was used:
+conda activate image-reg
+
+# If venv was used:
+source .venv/bin/activate
+
+dareg --help
+```
+
+### Manual Install
+
+If you prefer to manage environments yourself:
 
 ```bash
-pip install ".[all]"    # includes scikit-image, trimesh, imageio
+pip install .           # standard install
+pip install -e .        # editable (changes apply without reinstalling)
+pip install ".[all]"    # with optional STL/video extras
 ```
 
 ## Quick Start

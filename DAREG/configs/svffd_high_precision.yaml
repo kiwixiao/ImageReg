@@ -1,0 +1,47 @@
+# SVFFD High Precision Configuration
+# More iterations, stronger regularization for diffeomorphic guarantee
+# Use when topology preservation is critical
+
+pipeline:
+  model: "rigid+affine+svffd"
+
+svffd:
+  control_point_spacing: 4
+  pyramid_levels: 4
+  iterations_per_level: [150, 150, 120, 100]
+  learning_rates_per_level: [0.008, 0.006, 0.005, 0.004]
+  integration_steps: 7
+  regularization:
+    bending_weight: 0.001
+    diffusion_weight: 0.0005
+    velocity_smoothing_sigma: 1.0
+    laplacian_weight: 0.0002
+    jacobian_penalty: 0.005
+  convergence:
+    min_delta: 1e-7
+    patience: 30
+
+# Rigid/Affine stages
+rigid:
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.01, 0.01, 0.01, 0.01]
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+affine:
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.01, 0.01, 0.01, 0.01]
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+similarity:
+  num_bins: 64
+  foreground_threshold: 0.01
+
+output:
+  auto_name: true
+  name_template: "svffd_hprec_cp{spacing}_bend{bending}_steps{steps}"

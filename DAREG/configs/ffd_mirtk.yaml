@@ -1,0 +1,49 @@
+# FFD MIRTK-Equivalent Configuration
+# Matches MIRTK register command behavior exactly
+# Use this as baseline for comparing FFD results with MIRTK
+
+pipeline:
+  model: "rigid+affine+ffd"
+
+ffd:
+  control_point_spacing: 4
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.01, 0.01, 0.01, 0.01]
+  regularization:
+    bending_weight: 0.001
+    diffusion_weight: 0.0005
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+  optimizer:
+    max_rejected_streak: 1
+    step_rise: 1.1
+    step_drop: 0.5
+    epsilon: 1e-4
+    delta: 1e-12
+
+# Rigid/Affine stages (unchanged)
+rigid:
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.01, 0.01, 0.01, 0.01]
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+affine:
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.01, 0.01, 0.01, 0.01]
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+similarity:
+  num_bins: 64
+  foreground_threshold: 0.01
+
+output:
+  auto_name: true
+  name_template: "ffd_mirtk_cp{spacing}_bend{bending}"

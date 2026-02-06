@@ -1,1 +1,0 @@
-# Sequential Registration Clean Implementation

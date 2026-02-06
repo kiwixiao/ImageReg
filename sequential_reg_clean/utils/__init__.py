@@ -1,1 +1,0 @@
-# Utility functions for image handling and coordinate systems

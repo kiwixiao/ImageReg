@@ -1,0 +1,20 @@
+# Claude Code
+CLAUDE.md
+CLAUDE.local.md
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# OS
+.DS_Store
+
+# Medical image data (too large for git)
+*.nii
+*.nii.gz
+
+# Test outputs
+test_output_*/
+motion_output/

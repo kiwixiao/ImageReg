@@ -1,0 +1,91 @@
+# Testing Project Configuration
+# Can run standalone: python -m DAREG.main_motion --config inputs_testing/registration_config.yaml
+# Or auto-loaded when --image4d is from this folder
+
+# Input/Output Paths
+io:
+  source_image: inputs_testing/dynamic.nii
+  target_image: inputs_testing/static.nii
+  segmentation: inputs_testing/airway_seg.nii.gz
+  output_dir: ./motion_output
+
+# Pipeline Settings
+pipeline:
+  model: rigid+affine+ffd       # rigid, rigid+affine, rigid+affine+ffd, rigid+affine+svffd
+  device: auto                   # auto, cpu, cuda, mps
+  verbose: false
+  skip_alignment: false
+  skip_refinement: false
+  resume: false
+  extract_frames: false
+  no_viz: false
+
+# Frame Selection (for 4D images)
+frame_selection:
+  start_frame: 0       # Beginning frame (0-indexed)
+  num_frames: null     # Number of frames (null = all)
+
+# Similarity Metric
+similarity:
+  metric: nmi
+  num_bins: 64
+  foreground_threshold: 0.01
+  # Sampling options for NMI speedup (use one or neither for full computation):
+  # num_samples: 10000    # Sample fixed number of voxels (faster, ~20-40% speedup)
+  # sample_ratio: 0.1     # Sample 10% of voxels (faster, ~20-40% speedup)
+  # Leave both commented/null for full computation (most accurate)
+
+# Rigid Registration
+rigid:
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.01, 0.01, 0.01, 0.01]
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+# Affine Registration
+affine:
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.005, 0.005, 0.005, 0.005]
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+# FFD Registration (B-spline)
+ffd:
+  control_point_spacing: 4
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.01, 0.01, 0.01, 0.01]
+  regularization:
+    bending_weight: 0.0005    # Softer (was 0.001) - allows more local deformation
+    diffusion_weight: 0.00025  # Proportionally reduced
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+# SVFFD Registration (Diffeomorphic)
+svffd:
+  control_point_spacing: 4
+  pyramid_levels: 4
+  iterations_per_level: [100, 100, 100, 100]
+  learning_rates_per_level: [0.005, 0.005, 0.005, 0.005]
+  integration_steps: 5
+  regularization:
+    bending_weight: 0.0005
+    diffusion_weight: 0.00025
+    velocity_smoothing_sigma: 0.0
+    laplacian_weight: 0.0
+    jacobian_penalty: 0.0
+  convergence:
+    min_delta: 1e-6
+    patience: 20
+
+# Output Settings
+output:
+  auto_name: true   # Output folder includes settings (e.g., ffd_cp4_bend0.0005)
+  save_intermediate: true
+  save_transforms: true
+  create_visualizations: true

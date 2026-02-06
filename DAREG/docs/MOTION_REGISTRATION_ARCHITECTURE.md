@@ -16,12 +16,12 @@ Medical dynamic imaging (breathing, cardiac) often produces multi-dimensional da
 | 4D | (X, Y, Z, T) | Standard 4D time series |
 | 5D | (X, Y, Z, 1, T) | Common in dynamic MRI (singleton dim 3) |
 
-### OSAMRI016 Example Data
+### Example Test Data
 
 ```
-OSAMRI016_2501_static.nii     - 3D static high-res (158, 352, 352), spacing ~0.6mm
-OSAMRI016_2601_Dynamic.nii    - 5D dynamic (192, 192, 12, 1, 90) = 90 time frames
-OSAMRI016_2501_airway_seg.nii.gz - Segmentation mask on static image
+static.nii         - 3D static high-res (158, 352, 352), spacing ~0.6mm
+dynamic.nii        - 5D dynamic (192, 192, 12, 1, 90) = 90 time frames
+airway_seg.nii.gz  - Segmentation mask on static image
 ```
 
 The Dynamic image appears as 3D to SimpleITK because SITK doesn't handle 5D well.

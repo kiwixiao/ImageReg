@@ -13,10 +13,10 @@ Medical image registration system replicating MIRTK (Medical Image Registration 
 ```bash
 # Primary Pipeline - DAREG Motion Registration (with YAML config)
 python -m DAREG.main_motion \
-    --image4d inputs_OSAMRI016/OSAMRI016_2601_Dynamic.nii \
-    --static inputs_OSAMRI016/OSAMRI016_2501_static.nii \
-    --seg inputs_OSAMRI016/OSAMRI016_2501_airway_seg.nii.gz \
-    --config inputs_OSAMRI016/registration_config.yaml \
+    --image4d inputs_testing/dynamic.nii \
+    --static inputs_testing/static.nii \
+    --seg inputs_testing/airway_seg.nii.gz \
+    --config inputs_testing/registration_config.yaml \
     --output ./motion_output \
     --device cpu --verbose
 
@@ -29,6 +29,14 @@ python -m DAREG.main_motion ... --start-frame 0 --num-frames 4
 # Available registration models:
 # rigid+affine+ffd   - Standard B-spline FFD (faster)
 # rigid+affine+svffd - Diffeomorphic SVFFD (topology-preserving)
+
+# 4D CT mode (no static image, seg on frame 0):
+# Omit --static → alignment auto-skipped, frame 0 = reference
+python -m DAREG.main_motion \
+    --image4d 4d_ct.nii \
+    --seg frame0_segmentation.nii.gz \
+    --output ./ct_output \
+    --device cpu --verbose
 ```
 
 ## Core Architecture

@@ -1607,27 +1607,30 @@ def create_multi_slice_grid_with_arrows(
             # Add displacement arrows AT GRID INTERSECTION POINTS
             # Use grid_stride to align arrows with grid lines
 
-            # Arrows at grid intersections (every grid_stride pixels)
-            # Use arrow_step as multiplier for sparser arrows (e.g., every 2nd or 3rd grid point)
-            arrow_spacing = grid_stride * max(1, arrow_step // grid_stride)
+            # Adaptive arrow spacing: ensure max ~6 arrows per dimension
+            # so arrows are always sparse enough to see the background
+            base_spacing = grid_stride * max(1, arrow_step // grid_stride)
+            min_dim = min(h_size, w_size)
+            adaptive_spacing = max(base_spacing, min_dim // 6)
+            # Round up to nearest grid_stride multiple for alignment
+            adaptive_spacing = ((adaptive_spacing + grid_stride - 1) // grid_stride) * grid_stride
 
-            y_coords = np.arange(arrow_spacing // 2, h_size, arrow_spacing)
-            x_coords = np.arange(arrow_spacing // 2, w_size, arrow_spacing)
+            y_coords = np.arange(adaptive_spacing // 2, h_size, adaptive_spacing)
+            x_coords = np.arange(adaptive_spacing // 2, w_size, adaptive_spacing)
             X, Y = np.meshgrid(x_coords, y_coords)
 
-            # Sample displacement at arrow positions (in world coords / mm)
-            U = disp_h[::arrow_spacing, ::arrow_spacing][:Y.shape[0], :X.shape[1]]
-            V = disp_v[::arrow_spacing, ::arrow_spacing][:Y.shape[0], :X.shape[1]]
+            # Sample displacement at arrow positions
+            U = disp_h[::adaptive_spacing, ::adaptive_spacing][:Y.shape[0], :X.shape[1]]
+            V = disp_v[::adaptive_spacing, ::adaptive_spacing][:Y.shape[0], :X.shape[1]]
 
-            # Scale arrows for visibility:
-            # arrow length in pixels = displacement_mm * scale_factor
-            # Target: max arrow ~20 pixels for visibility without overwhelming
-            if has_meaningful_displacement:  # Only draw if there's actual displacement
-                arrow_scale = 20.0 / vmax  # Max arrow = 20 pixels
+            if has_meaningful_displacement and X.size > 0:
+                # Max arrow length = 60% of spacing to prevent overlap
+                max_arrow_px = adaptive_spacing * 0.6
+                arrow_scale = max_arrow_px / vmax
 
                 ax.quiver(X, Y, U * arrow_scale, V * arrow_scale,
-                         color='red', alpha=0.7, scale=1, scale_units='xy',
-                         width=0.002 * max(h_size, w_size), headwidth=3, headlength=3)
+                         color='red', alpha=0.5, scale=1, scale_units='xy',
+                         width=0.003, headwidth=2.5, headlength=2.5)
 
             phys_pos = slice_idx * dim_spacing
             ax.set_title(f'{axis_name}={slice_idx} ({phys_pos:.1f}mm)',
